@@ -1,0 +1,118 @@
+ <section class='content-header' style="height:102px;z-index:0;background:#0979c7">
+            </section>
+            <section class='content' style="margin-top:-95px">
+                <?php if ($pg == '') : ?>
+                    <div class='row'>
+                        <div class="col-md-4">
+                            <div class="box box-solid">
+                                <div class='box-header with-border'>
+                                    <h3 class='box-title'><i class='fa fa-calendar'></i> Absensi Harian</h3>
+                                    <div class='box-tools pull-right'></div>
+                                </div><!-- /.box-header -->
+                                <!-- /.box-header -->
+                                <div class="box-body">
+                                    <div class="img-responsive" style="min-height: 225px; position: relative;">
+                                        <img src="<?= $homeurl ?>/dist/img/absen/absen-<?= rand(1, 12) ?>.jpg" style="width: 100%; border-radius: 20px; background-color: #ecf0f5;" />
+                                        <div id="absen-form" style="padding: 15px; padding-bottom: 20px; background: #ffffff90; position: absolute; bottom: 0; width: 100%;">
+                                            <p style="text-align: center; font-size: 1.5em;">Absen dulu yuk hari ini.</p>
+                                            <button type="button" class="btn-warning btn btn-block btn-lg">Absen Sekarang</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /.box-body -->
+                                <script>
+                                    $(document).ready(function() {
+                                        $.ajax({
+                                            url: '<?= $homeurl ?>/tools/absen.php?user=<?= base64_encode($_SESSION['id_siswa'] .';'. $_SESSION['level']) ?>&api_key=<?= KEY ?>',
+                                            success: function(data) {
+                                                data = JSON.parse(data);
+                                                if (data.status == 'success') {
+                                                    $('#absen-form p').text('Anda sudah absen.');	
+                                                    $('#absen-form button').text('Berhasil Absen');
+                                                    $('#absen-form button').attr('class', 'btn btn-block btn-lg btn-success');
+                                                }
+                                            }
+                                        });
+
+                                        $('#absen-form > button').click(function(e) {
+                                            if (e.currentTarget.classList[e.currentTarget.classList.length - 1] == 'btn-success') {
+                                                return;
+                                            }
+                                            
+                                            $('.loader').show();
+                                            $.ajax({
+                                                url: '<?= $homeurl ?>/tools/absen.php?user=<?= base64_encode($_SESSION['id_siswa'] .';'. $_SESSION['level']) ?>&action=absen&api_key=<?= KEY ?>',
+                                                success: function(data) {
+                                                    data = JSON.parse(data);
+                                                    if (data.status == 'success') {
+                                                        $('#absen-form p').text('Anda sudah absen.');	
+                                                        $('#absen-form button').text('Berhasil Absen');
+                                                        $('#absen-form button').attr('class', 'btn btn-block btn-lg btn-success');
+                                                    } else {
+                                                        toastr.error(data.message);
+                                                    }
+                                                    $('.loader').hide();
+                                                },
+                                                error: function(e) {
+                                                    console.log(e);
+                                                    alert('Error pada saat request.');
+                                                    $('.loader').hide();
+                                                }
+                                            });
+                                        });
+                                    });
+                                </script>
+                            </div>
+                            <!-- /.box -->
+                        </div>
+                        <div class='col-md-4'>
+                            <div class='box box-solid'>
+                                <div class='box-header with-border'>
+                                    <h3 class='box-title'><i class="fas fa-bullhorn    "></i> Pengumuman</h3>
+                                </div><!-- /.box-header -->
+                                <div class='box-body'>
+                                    <div id='pengumuman'>
+                                   <?php $logC = 0;
+                                        echo "<ul class='timeline'><br>";
+                                        $logQ = mysqli_query($koneksi, "SELECT * FROM pengumuman where type='eksternal' ORDER BY date DESC");
+
+                                        while ($log = mysqli_fetch_array($logQ)) {
+                                            $logC++;
+                                            $user = mysqli_fetch_array(mysqli_query($koneksi, "SELECT * FROM pengawas WHERE id_pengawas='$log[user]'"));
+                                            if ($log['type'] == 'internal') {
+                                                $bg = 'bg-green';
+                                                $color = 'text-green';
+                                            } else {
+                                                $bg = 'bg-blue';
+                                                $color = 'text-blue';
+                                            }
+                                            echo "
+                                                        
+                                                        
+                                                        <!-- timeline time label -->
+                                                        
+                                                        <li><i class='fa fa-envelope $bg'></i>
+                                                        <div class='timeline-item'>
+                                                        <span class='time'> <i class='fa fa-calendar'></i> " . buat_tanggal('d-m-Y', $log['date']) . " <i class='fa fa-clock-o'></i> " . buat_tanggal('h:i', $log['date']) . "</span>
+                                                        <h3 class='timeline-header' style='background-color:#f9f0d5'><a class='$color' href='#'>$log[judul]</a> <small> $user[nama]</small>
+                                                        
+                                                        </h3>
+                                                        <div class='timeline-body'>
+                                                        " . ucfirst($log['text']) . "	
+                                                        </div>
+                                                        
+                                                        </div>
+                                                        </li>
+                                            
+                                                        
+                                                    ";
+                                        }
+                                        if ($logC == 0) {
+                                            echo "<p class='text-center'>Tidak ada aktifitas.</p>";
+                                        }
+                                        echo "</ul>";?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
