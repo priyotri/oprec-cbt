@@ -1,0 +1,177 @@
+<?php if ($pg == '') : ?>
+					<?php
+					$testongoing = mysqli_num_rows(mysqli_query($koneksi, "SELECT * FROM nilai WHERE ujian_mulai!='' AND ujian_selesai=''"));
+					$testdone = mysqli_num_rows(mysqli_query($koneksi, "SELECT * FROM nilai WHERE ujian_mulai!='' AND ujian_selesai!=''"));
+
+					if ($siswa <> 0) {
+						$testongoing_per = (1000 / $siswa) * $testongoing;
+						$testongoing_per = number_format($testongoing_per, 2, '.', '');
+						$testongoing_per = str_replace('.00', '', $testongoing_per);
+						$testdone_per = (1000 / $siswa) * $testdone;
+						$testdone_per = number_format($testdone_per, 2, '.', '');
+						$testdone_per = str_replace('.00', '', $testdone_per);
+					} else {
+						$testongoing_per = $testdone_per = 0;
+					}
+					?>
+					<?php if ($pengawas['level'] == 'admin') : ?>
+						<div class='row'>
+							<div class="col-md-4">
+								<div class="box box-solid">
+
+									<!-- /.box-header -->
+									<div class="box-body">
+										<div class="chartjs-size-monitor">
+											<div class="chartjs-size-monitor-expand">
+												<div class=""></div>
+											</div>
+											<div class="chartjs-size-monitor-shrink">
+												<div class=""></div>
+											</div>
+										</div>
+										<p><b>Statistik Lembaga</b></p>
+										<p>Data Statistik Lembaga </p>
+										<canvas id="chart-sek" class="chartjs-render-monitor" style="display: block; width: 323px; height: 190px;"></canvas>
+									</div>
+									<!-- /.box-body -->
+								</div>
+								<!-- /.box -->
+							</div>
+							<div class="col-md-4">
+								<div class="box box-solid">
+
+									<!-- /.box-header -->
+									<div class="box-body">
+										<div class="chartjs-size-monitor">
+											<div class="chartjs-size-monitor-expand">
+												<div class=""></div>
+											</div>
+											<div class="chartjs-size-monitor-shrink">
+												<div class=""></div>
+											</div>
+										</div>
+										<p><b>Statistik Ujian</b></p>
+										<p>Data Statistik Ujian </p>
+										<canvas id="chart-sek2" class="chartjs-render-monitor" style="display: block; width: 323px; height: 190px;"></canvas>
+									</div>
+									<!-- /.box-body -->
+								</div>
+								<!-- /.box -->
+							</div>
+							<div class="col-md-4">
+								<div class="box box-solid">
+
+									<!-- /.box-header -->
+									<div class="box-body">
+										<p><b>Widget</b></p>
+										<p>Shortcut box widget</p>
+										<div class="col-lg-6">
+											<div class="small-box bg-blue">
+												<div class="inner">
+													<h3><?= $siswa ?></h3>
+													<p>Jumlah Siswa</p>
+												</div>
+												<div class="icon">
+													<i class="fa fa-users"></i>
+												</div>
+												<a href="index.php?pg=siswa" class="small-box-footer">Lihat siswa <i class="fa fa-arrow-circle-right"></i></a>
+											</div>
+										</div>
+
+										<!-- <script>
+											$(document).ready(function() {
+												var token = 'f9rXTef0yzFYh1';
+												$.ajax({
+													url: "syncpengumuman.php?token=" + token,
+													success: function(respon) {
+														$('#infoweb').html(respon);
+													}
+												});
+											});
+										</script> -->
+										<div class="col-lg-6">
+											<div class="small-box bg-green">
+												<div class="inner">
+													<h3><?= $kelas ?></h3>
+													<p>Jumlah Kelas</p>
+												</div>
+												<div class="icon">
+													<i class="fa fa-school"></i>
+												</div>
+												<a href="index.php?pg=kelas" class="small-box-footer">Lihat kelas <i class="fa fa-arrow-circle-right"></i></a>
+											</div>
+										</div>
+									</div>
+									<!-- /.box -->
+								</div>
+
+							</div>
+							<?php if ($setting['server'] == 'lokal') : ?>
+								<div class="col-lg-8">
+									<div class="small-box ">
+										<div class="inner">
+											<img id='loading-image' src='<?= $homeurl ?>/dist/img/ajax-loader.gif' style='display:none; width:50px;' />
+											<p id='statusserver'></p>
+											<p>Status Server</p>
+										</div>
+										<div class="icon">
+											<i class="fa fa-desktop"></i>
+										</div>
+										<a href="index.php?pg=sinkronset" class="small-box-footer">Selengkapnya <i class="fa fa-arrow-circle-right"></i></a>
+									</div>
+								</div>
+								<script>
+									$.ajax({
+										type: 'POST',
+										url: 'statusserver.php',
+										beforeSend: function() {
+											$('#loading-image').show();
+										},
+										success: function(response) {
+											$('#statusserver').html(response);
+											$('#loading-image').hide();
+
+										}
+									});
+								</script>
+							<?php endif; ?>
+							<div class="col-md-8">
+								<div class='box box-solid direct-chat direct-chat-warning'>
+									<div class='box-header with-border'>
+										<h3 class='box-title'><i class='fas fa-bullhorn fa-fw'></i>
+											Pengumuman
+										</h3>
+										<div class='box-tools pull-right'>
+
+											<a href='index.php?pg=<?= $pg ?>&ac=clearpengumuman' class='btn btn-default' title='Bersihkan Pengumuman'><i class='fa fa-trash'></i></a>
+										</div>
+									</div>
+									<div class='box-body'>
+										<div id='pengumuman'>
+											<p class='text-center'>
+												<br /><i class='fa fa-spin fa-circle-o-notch'></i> Loading....
+											</p>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class='col-md-4'>
+								<div class='box box-solid direct-chat direct-chat-warning'>
+									<div class='box-header with-border'>
+										<h3 class='box-title'><i class='fa fa-history'></i> Log Aktifitas</h3>
+										<div class='box-tools pull-right'>
+											<a href='index.php?pg=<?= $pg ?>&ac=clearlog' class='btn btn-default' title='Bersihkan Log'><i class='fa fa-trash'></i></a>
+										</div>
+									</div>
+									<div class='box-body'>
+										<div id='log-list'>
+											<p class='text-center'>
+												<br /><i class='fa fa-spin fa-circle-o-notch'></i> Loading....
+											</p>
+										</div>
+									</div>
+								</div>
+							</div>
+
+						</div>
+					<?php endif ?>
